@@ -1,28 +1,27 @@
 package soda.example.lojaatv.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import soda.example.lojaatv.model.Cliente;
+import soda.example.lojaatv.service.ClienteService;
 
 @RestController
-@RequestMapping("/cliente")
 public class ClienteController {
+
+    @Autowired
+    private ClienteService clienteService;
+
     @PostMapping("/clientes")
-    public ResponseEntity cadastrar(@RequestBody Cliente cliente) {
-        if (cliente.getNome() == null || cliente.getNome().isBlank()) {
-            return ResponseEntity.badRequest()
-                    .body("Nome obrigatório");
+    public ResponseEntity Cadastrar(@RequestBody Cliente cliente){
+        try {
+            Cliente salvo = clienteService.Cadastrar(cliente);
+            return ResponseEntity.ok(salvo);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        if (clienteRepository.existsByEmail(cliente.getEmail())) {
-            return ResponseEntity.badRequest()
-                    .body("Email já cadastrado");
-        }
-        cliente.setAtivo(true);
-        cliente.setDataCadastro(LocalDateTime.now());
-        Cliente salvo = clienteRepository.save(cliente);
-        return ResponseEntity.ok(salvo);
     }
 
 }
